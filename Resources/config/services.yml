@@ -1,0 +1,6 @@
+services:
+    simple_menu.menu:
+        class: SimpleMenuBundle\Service\Menu
+        calls:
+            - [ setRequest, [ '@request_stack' ]]
+        arguments: [ '@router.default' ]
