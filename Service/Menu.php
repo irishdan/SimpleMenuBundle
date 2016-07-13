@@ -27,11 +27,6 @@ class Menu
     private $menuArray = [];
 
     /**
-     * @var
-     */
-    private $router;
-
-    /**
      * @var \ArrayIterator
      */
     private $routeIterator;
@@ -42,7 +37,6 @@ class Menu
      */
     public function __construct(RouterInterface $router)
     {
-        $this->router = $router;
         $routeCollection = $router->getRouteCollection();
         $this->routeIterator = $routeCollection->getIterator();
     }
