@@ -2,5 +2,13 @@ services:
     simple_menu.menu:
         class: SimpleMenuBundle\Service\Menu
         calls:
-            - [ setRequest, [ '@request_stack' ]]
+              - [ setRequest, [ '@request_stack' ]]
         arguments: [ '@router.default' ]
+
+    # Twig extensions
+    # simple_menu.twig_extension:
+    #     class: SimpleMenuBundle\Twig\SimpleMenuExtension
+    #     public: false
+    #     arguments: [ '@simple_menu.menu' ]
+    #     tags:
+    #         - { name: twig.extension }

@@ -88,6 +88,34 @@ class Menu
         }
     }
 
+    private function firstClass()
+    {
+        // @TODO: What about grouped menus
+        if (!empty($this->menuArray[0])) {
+            if (empty($this->menuArray[0]['class'])) {
+                $this->menuArray[0]['class'] = 'first';
+            }
+            else {
+                $this->menuArray[0]['class'] .= ' first';
+            }
+        }
+    }
+
+    private function lastClass()
+    {
+        // @TODO: What about grouped menus
+        $num = count($this->menuArray);
+        $last = $num -1;
+        if (!empty($this->menuArray[$last])) {
+            if (empty($this->menuArray[$last]['class'])) {
+                $this->menuArray[$last]['class'] = 'last';
+            }
+            else {
+                $this->menuArray[$last]['class'] .= ' last';
+            }
+        }
+    }
+
     /**
      * Generates an menu array.
      *
@@ -124,6 +152,10 @@ class Menu
         // Do sorting.
         $this->doSorting();
 
+        // Add first and last classes.
+        $this->firstClass();
+        $this->lastClass();
+
         return $this->menuArray;
     }
 
@@ -133,5 +165,10 @@ class Menu
     public function setRequest(RequestStack $request_stack) {
         $request = $request_stack->getMasterRequest();
         $this->currentRoute = $request->get('_route');
+    }
+
+    public function appendItem()
+    {
+
     }
 }
