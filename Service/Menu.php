@@ -67,6 +67,15 @@ class Menu
         }
     }
 
+    public function activeItem()
+    {
+        foreach ($this->menuArray as $key => $item) {
+            $route = empty($item['route']) ? '' : $item['route'];
+            $active = $this->currentRoute == $route ? TRUE : FALSE;
+            $this->menuArray[$key]['active'] = $active;
+        }
+    }
+
     /**
      * Generated a nested array of items based on the parent attribute.
      */
@@ -128,20 +137,21 @@ class Menu
             if (!empty($defaults)) {
                 if (!empty($defaults['menu'])) {
                     if ($defaults['menu'] == $menuName) {
-                        // Set active item.
-                        $active = $this->currentRoute == $route ? TRUE : FALSE;
                         $this->menuArray[] = [
-                            'route' => $route,
-                            'path' => $item->getPath(),
                             'title' => empty($defaults['title'])? '' : $defaults['title'],
+                            'route' => $route,
+                            'href' => $item->getPath(),
                             'class' => empty($defaults['class'])? '' : $defaults['class'],
                             'group' => empty($defaults['group'])? '' : $defaults['group'],
-                            'active' => $active,
+                            'active' => FALSE,
                         ];
                     }
                 }
             }
         }
+        // Set active item.
+        $this->activeItem();
+        // $active = $this->currentRoute == $route ? TRUE : FALSE;
 
         // Do nesting.
         $this->doNesting();
@@ -152,7 +162,7 @@ class Menu
         // Do sorting.
         $this->doSorting();
 
-        // Add first and last classes.
+        // Ad first and last classes.
         $this->firstClass();
         $this->lastClass();
 
@@ -162,13 +172,28 @@ class Menu
     /**
      * @param RequestStack $request_stack
      */
-    public function setRequest(RequestStack $request_stack) {
+    public function setRequest(RequestStack $request_stack)
+    {
         $request = $request_stack->getMasterRequest();
         $this->currentRoute = $request->get('_route');
     }
 
-    public function appendItem()
+    public function appendItem($title = '', $route = '', $href = '', $class = '', $group ='')
     {
+        $this->menuArray[] = [
+            'title' => $title,
+            'route' => $route,
+            'href' => $href,
+            'class' => $class,
+            'group' => $group,
+        ];
 
+        $this->activeItem();
+
+        // Ad first and last classes.
+        $this->firstClass();
+        $this->lastClass();
+
+        return $this->menuArray;
     }
 }
