@@ -67,6 +67,9 @@ class Menu
         }
     }
 
+    /**
+     *
+     */
     public function activeItem()
     {
         foreach ($this->menuArray as $key => $item) {
@@ -81,7 +84,23 @@ class Menu
      */
     private function doNesting()
     {
-        // @TODO: Implement a function to nest items.
+        foreach ($this->menuArray as $route => $item) {
+            $children = [];
+            if (!empty($item['parent'])) {
+                $parentRoute = $item['parent'];
+                if (!empty($this->menuArray[$parentRoute])) {
+                    if (empty($this->menuArray[$parentRoute]['children'])) {
+                        $this->menuArray[$parentRoute]['children'] = [];
+                    }
+                    $this->menuArray[$parentRoute]['children'][$route] = $item;
+                    // Parent should inherit child's active state.
+                    if ($item['active']) {
+                        $this->menuArray[$parentRoute]['active'] = TRUE;
+                    }
+                    unset($this->menuArray[$route]);
+                }
+            }
+        }
     }
 
     /**
@@ -97,9 +116,11 @@ class Menu
         }
     }
 
+    /**
+     *
+     */
     private function firstClass()
     {
-        // @TODO: What about grouped menus
         if (!empty($this->menuArray[0])) {
             if (empty($this->menuArray[0]['class'])) {
                 $this->menuArray[0]['class'] = 'first';
@@ -110,6 +131,9 @@ class Menu
         }
     }
 
+    /**
+     *
+     */
     private function lastClass()
     {
         // @TODO: What about grouped menus
@@ -137,13 +161,14 @@ class Menu
             if (!empty($defaults)) {
                 if (!empty($defaults['menu'])) {
                     if ($defaults['menu'] == $menuName) {
-                        $this->menuArray[] = [
+                        $this->menuArray[$route] = [
                             'title' => empty($defaults['title'])? '' : $defaults['title'],
                             'route' => $route,
                             'href' => $item->getPath(),
                             'class' => empty($defaults['class'])? '' : $defaults['class'],
                             'group' => empty($defaults['group'])? '' : $defaults['group'],
                             'active' => FALSE,
+                            'parent' => empty($defaults['parent'])? '' : $defaults['parent'],
                         ];
                     }
                 }
@@ -151,7 +176,6 @@ class Menu
         }
         // Set active item.
         $this->activeItem();
-        // $active = $this->currentRoute == $route ? TRUE : FALSE;
 
         // Do nesting.
         $this->doNesting();
@@ -178,6 +202,14 @@ class Menu
         $this->currentRoute = $request->get('_route');
     }
 
+    /**
+     * @param string $title
+     * @param string $route
+     * @param string $href
+     * @param string $class
+     * @param string $group
+     * @return array
+     */
     public function appendItem($title = '', $route = '', $href = '', $class = '', $group ='')
     {
         $this->menuArray[] = [
