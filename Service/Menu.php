@@ -267,8 +267,6 @@ class Menu
                 }
             }
         }
-
         $this->breadcrumb = $breadcrumb;
-        dump($breadcrumb);
     }
 }
