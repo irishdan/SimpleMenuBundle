@@ -11,25 +11,27 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class Menu
 {
+    protected $breadcrumb;
+
     /**
      * @var
      */
-    private $currentRoute;
+    protected $currentRoute;
 
     /**
      * @var bool
      */
-    private $hasGroups = FALSE;
+    protected $hasGroups = FALSE;
 
     /**
      * @var array
      */
-    private $menuArray = [];
+    protected $menuArray = [];
 
     /**
      * @var \ArrayIterator
      */
-    private $routeIterator;
+    protected $routeIterator;
 
     /**
      * Menu constructor.
@@ -70,7 +72,7 @@ class Menu
     /**
      *
      */
-    public function activeItem()
+    protected function activeItem()
     {
         foreach ($this->menuArray as $key => $item) {
             $route = empty($item['route']) ? '' : $item['route'];
@@ -162,23 +164,27 @@ class Menu
                 if (!empty($defaults['menu'])) {
                     if ($defaults['menu'] == $menuName) {
                         $this->menuArray[$route] = [
-                            'title' => empty($defaults['title'])? '' : $defaults['title'],
+                            'title' => empty($defaults['title']) ? '' : $defaults['title'],
                             'route' => $route,
                             'href' => $item->getPath(),
-                            'class' => empty($defaults['class'])? '' : $defaults['class'],
-                            'group' => empty($defaults['group'])? '' : $defaults['group'],
+                            'class' => empty($defaults['class']) ? '' : $defaults['class'],
+                            'group' => empty($defaults['group']) ? '' : $defaults['group'],
                             'active' => FALSE,
-                            'parent' => empty($defaults['parent'])? '' : $defaults['parent'],
+                            'parent' => empty($defaults['parent']) ? '' : $defaults['parent'],
+                            'root' => empty($defaults['root']) ? FALSE : TRUE,
                         ];
                     }
                 }
             }
         }
+
         // Set active item.
         $this->activeItem();
 
         // Do nesting.
         $this->doNesting();
+
+        $this->doBreadcrumb();
 
         // Do grouping.
         $this->doGrouping();
@@ -222,10 +228,47 @@ class Menu
 
         $this->activeItem();
 
-        // Ad first and last classes.
+        // Add first and last classes.
         $this->firstClass();
         $this->lastClass();
 
         return $this->menuArray;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getBreadcrumb()
+    {
+        return $this->breadcrumb;
+    }
+
+    public function doBreadcrumb()
+    {
+        $breadcrumb = [];
+
+        // Get the root.
+        foreach ($this->menuArray as $route => $item) {
+            if (!empty($item['root'])) {
+                $breadcrumb[] = $item;
+            }
+        }
+
+        // Get the items.
+        foreach ($this->menuArray as $route => $item) {
+            if (!empty($item['active'])) {
+                $breadcrumb[] = $item;
+                if (!empty($item['children'])) {
+                    foreach ($item['children'] as $child) {
+                        if (!empty($child['active'])) {
+                            $breadcrumb[] = $child;
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->breadcrumb = $breadcrumb;
+        dump($breadcrumb);
     }
 }
