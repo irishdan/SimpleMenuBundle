@@ -164,7 +164,7 @@ class Menu
                 if (!empty($defaults['menu'])) {
                     if ($defaults['menu'] == $menuName) {
                         $this->menuArray[$route] = [
-                            'title' => empty($defaults['title']) ? '' : $defaults['title'],
+                            'title' => empty($defaults['page_title']) ? '' : $defaults['page_title'],
                             'route' => $route,
                             'href' => $item->getPath(),
                             'class' => empty($defaults['class']) ? '' : $defaults['class'],
@@ -256,7 +256,7 @@ class Menu
 
         // Get the items.
         foreach ($this->menuArray as $route => $item) {
-            if (!empty($item['active'])) {
+            if (!empty($item['active']) && empty($item['root'])) {
                 $breadcrumb[] = $item;
                 if (!empty($item['children'])) {
                     foreach ($item['children'] as $child) {
